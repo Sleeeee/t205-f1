@@ -1,5 +1,5 @@
 # Simulation de Grand Prix F1
-Cours de Systèmes d'exploitation II - C. Masson - Septembre 2024
+Cours de Systèmes d'exploitation II - C. Masson - Septembre à Décembre 2024
 ## Participants
 CARMO SILVEIRINHA Tiago - HERTMANS Mathéo - STAS Justin - VANDERMEULEN Arnaud
 ## Objectif
