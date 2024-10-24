@@ -1,11 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <string.h>
-#include <unistd.h>
-
 char path[255] = "";
-//Variable global contenant le chemin du fichier créé ou a créé
+//Variable global contenant le chemin du fichier créé ou a créer
 
 int path_create (char dir_name[], char file_name[]){
 	//Crée un string indiquant le chemin du directory "dir_name" et le nom du fichier "file_name" suivi de l'extension ".txt"
@@ -24,6 +18,7 @@ int file_gen (char content[]){
 
 	if(path_open == -1){
 		perror("Une erreur d'ouverture s'est produite");
+    return -1;
 	}
 	//Vérifie si il y a une erreur lors de l'ouverture
 
@@ -34,7 +29,7 @@ int file_gen (char content[]){
 	if(path_write == -1 || path_write_enter == -1){
 		perror("Une erreur d'écriture s'est produite");
 		close(path_open);
-		exit(EXIT_FAILURE);
+		return -1;
 	}
 	//Vérifie si il y a une erreur lors de l'écriture
 
