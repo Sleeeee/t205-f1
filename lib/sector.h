@@ -1,30 +1,29 @@
-// ATTENTION la fonction renvoie toujours le même résultat avec les mêmes paramètres
-
-float random_float(float min, float max) {
+int random_int(int min, int max) {
     // Génère un float aléatoire
-    return ((max - min) * ((float)rand() / RAND_MAX)) + min;
+    return (rand() % (max - min + 1)) + min;
 }
 
-int stand(float prob) {
+int stand(int prob) {
     // Renvoie un booléen indiquant si la voiture se rend au stand
-    // Retour au stand si le random atteint un float inférieur à la prob
-    return random_float(0.0, 1.0) <= prob;
+    // Retour au stand si le random atteint un nombre inférieur à prob
+    return random_int(0, 999) <= prob;
 }
 
-int crash(float prob) {
+int crash(int prob) {
     // Renvoie un booléen indiquant si la voiture se crashe
-    // Crash si le random atteint un float inférieur à la prob 
-    return random_float(0.0, 1.0) <= prob;
+    // Crash si le random atteint un nombre inférieur à prob 
+    return random_int(0, 999) <= prob;
 }
 
-float sector(int size_meters, float time_seed, float crash_prob) {
-    // Renvoie le temps du pilote pour parcourir le secteur / 0.0 si la voiture se crashe
+int sector(int size_meters, int time_seed, int crash_prob) {
+    // Renvoie le temps en millisecondes du pilote pour parcourir le secteur / 0 si la voiture se crashe
     if (crash(crash_prob)) {
-      return 0.0;
+      return 0;
     }
-
-    float min_time = time_seed * size_meters * 0.7;
-    float max_time = time_seed * size_meters * 1.3;
-    return random_float(min_time, max_time);
+    
+    // TODO : update les valeurs pour avoir quelque chose de cohérent
+    int min_time = time_seed * size_meters * 0.7;
+    int max_time = time_seed * size_meters * 1.3;
+    return random_int(min_time, max_time);
 }
 
