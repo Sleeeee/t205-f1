@@ -1,8 +1,10 @@
 // Contrôle la continuité d'un championnat en détectant les grand prix en cours et en lançant les étapes adéquates
 
 int start() {
-  printf("%s\n", "started");
-  // TODO : demander à l'utilisateur d'entrer les paramètres et initialiser le fichier
+  printf("Veuillez entrer le nom du Grand Prix (30 caractères maximum) :\n");
+  char gp[30];
+  scanf("%30s", &gp);
+  
   return 1;
 }
 
