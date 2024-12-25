@@ -24,6 +24,8 @@ int main(int argc, char *argv[]){
     perror("Veuillez entrer un et un seul argument : start / next / cancel");
     exit(1);
   }
+
+  char* gp = input_name(argv[1]);
   int phase = find_phase(argv[1]);
   if (phase == -1) {
     perror("Erreur de recherche de la phase à exécuter");
@@ -109,6 +111,7 @@ int main(int argc, char *argv[]){
   // Détachement de la shm du processus père et libération de l'espace
   shmdt(cars_shm);
   shmctl(shm_id, IPC_RMID, NULL);
+  free(gp);
 
   exit(0);
 }
