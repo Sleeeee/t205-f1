@@ -9,6 +9,7 @@ int init_car(int id, int car_num, int sem_id, car* cars_shm, int phase) {
   cars_shm[id].id = car_num;
   cars_shm[id].laps_count = 0;
   cars_shm[id].time_total = 0;
+  cars_shm[id].time_best = 512; // Temps plus long que ce qu'il est possible d'effectuer pour assurer la réécriture
   // Lancement de la course
   cars_shm[id].status = 1;
   race(5, id, cars_shm);

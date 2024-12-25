@@ -70,18 +70,20 @@ int main(int argc, char *argv[]){
   }
 
   int cars_running = CAR_COUNT;
+  car cars_copy[CAR_COUNT];
   // Tant qu'il y a encore des voitures en course
   while (cars_running > 0) {
     sleep(1);
     cars_running = 0;
-    display_refresh();
-
-    // On compte le nombre de voitures en course
+    memcpy(cars_copy, cars_shm, sizeof(car) * CAR_COUNT); // Copie locale de la shared memory
+    sort_cars(cars_copy, CAR_COUNT, phase); // Tri de la copie locale
+    display_refresh(); // clear
+    // On compte le nombre de voitures en course et on affiche les résultats triés
     for (int i = 0; i < CAR_COUNT; i++) {
-      if (cars_shm[i].status == 1) {
+      display_car(cars_copy[i]);
+      if (cars_copy[i].status == 1) {
         cars_running += 1;
       }
-      display_car(cars_shm[i].id, cars_shm[i].laps_count,cars_shm[i].time_total, cars_shm[i].time_sectors[0], cars_shm[i].time_sectors[1], cars_shm[i].time_sectors[2], cars_shm[i].status);
     }
   }
 
