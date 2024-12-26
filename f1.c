@@ -18,9 +18,8 @@
 #include "lib/race.h"
 #include "lib/car.h"
 
-// TODO : allocation dynamique en fonction de l'étape et du nombre de voitures qui courent
-#define CAR_COUNT 20
-static const int CAR_NUMS[] = {1, 11, 44, 63, 16, 55, 4, 81, 14, 18, 10, 31, 23, 2, 22, 3, 77, 24, 20, 27};
+int CAR_COUNT;
+int CAR_NUMS[20]; // Pas d'alloation dynamique
 
 int main(int argc, char *argv[]){
   // Lancement du programme et recherche de la phase à exécuter
@@ -30,7 +29,7 @@ int main(int argc, char *argv[]){
   }
 
   char* gp = input_name(argv[1]);
-  int phase = find_phase(argv[1], gp);
+  int phase = find_phase(argv[1], gp, &CAR_COUNT, CAR_NUMS); // Trouve la phase correspondante et initialise la liste des participants
   if (phase == -1) {
     perror("Erreur de recherche de la phase à exécuter");
     exit(1);

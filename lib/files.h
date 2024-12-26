@@ -62,3 +62,11 @@ int read_highest_phase(char* gp) {
   }
   return highest_phase;
 }
+
+void fetch_contestants(char* gp, int phase, int* car_count, int* car_nums) {
+  // TODO : récupérer les participants et les stocker dans les variables passées en paramètre
+  *car_count = INITIAL_CAR_COUNT;
+  for (size_t i = 0; i < INITIAL_CAR_COUNT; i++) {
+    car_nums[i] = INITIAL_CAR_NUMS[i];
+  }
+}

@@ -93,14 +93,21 @@ char* input_name(char* action) {
   return gp;
 }
 
-int start(char* gp) {
+int start(char* gp, int* car_count, int* car_nums) {
   int is_special = validate_input("Quel type de championnat voulez-vous démarrer ? [C]lassique / [S]pecial", 'C', 'S');
+  // Copie des variables des participants
+  *car_count = INITIAL_CAR_COUNT;
+  for (size_t i = 0; i < INITIAL_CAR_COUNT; i++) {
+    car_nums[i] = INITIAL_CAR_NUMS[i];
+  }
   return is_special * 10 + 1; // 1 si classique, 11 si spécial
 }
 
-int next(char* gp) {
+int next(char* gp, int* car_count, int* car_nums) {
   // gp possède déjà un ou plusieurs fichiers existant car le nom a déjà été vérifié
-  return read_highest_phase(gp) + 1;
+  int last_phase = read_highest_phase(gp);
+  fetch_contestants(gp, last_phase, car_count, car_nums); // Remplit les variables dont les pointeurs sont donnés
+  return last_phase + 1;
 }
 
 int cancel(char* gp) {
@@ -108,12 +115,12 @@ int cancel(char* gp) {
   return 0;
 }
 
-int find_phase(char* action, char* gp) {
+int find_phase(char* action, char* gp, int* car_count, int* car_nums) {
   int phase;
   if (!strcmp(action, "start")) {
-    phase = start(gp);
+    phase = start(gp, car_count, car_nums);
   } else if (!strcmp(action, "next")) {
-    phase = next(gp);
+    phase = next(gp, car_count, car_nums);
   } else if (!strcmp(action, "cancel")) {
     phase = cancel(gp);
   }
