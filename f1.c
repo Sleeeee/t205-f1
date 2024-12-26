@@ -1,3 +1,5 @@
+#include <ctype.h>
+#include <dirent.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,8 +8,10 @@
 #include <time.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 #include "lib/constants.h"
+#include "lib/files.h"
 #include "lib/championship.h"
 #include "lib/display.h"
 #include "lib/sector.h"
@@ -27,14 +31,14 @@ int main(int argc, char *argv[]){
 
   char* gp = input_name(argv[1]);
   int phase = find_phase(argv[1], gp);
-  printf("%s\n", gp);
   if (phase == -1) {
     perror("Erreur de recherche de la phase à exécuter");
     exit(1);
   } else if (phase == 0) {
     // Si l'instruction était "cancel"
     exit(0);
-  } 
+  }
+  printf("Initialisation de la phase %d du Grand Prix de %s\n", phase, gp);
 
   // Définition d'une shared memory pouvant contenir NUM_CARS structures voitures
   int shm_id = shmget(IPC_PRIVATE, CAR_COUNT * sizeof(car), IPC_CREAT | 0666);

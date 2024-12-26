@@ -32,7 +32,7 @@ int validate_input(char* message, char one, char two) {
   } while (1);
 }
 
-int validate_int(char* message, int max_val) {
+int validate_in_range(char* message, int max_val) {
   int input;
   do {
     printf("%s ", message);
@@ -68,8 +68,8 @@ void validate_not_exists(char* message, char* string_var, char* strings[], size_
 char* input_name(char* action) {
   // Récupère le nom du Grand Prix correspondant à la requête
   char *gp = malloc(31 * sizeof(char));
-  char *gps[] = {"Tokyo", "Dubai", "Londondondondondondon"};
-  size_t gps_count = sizeof(gps)/sizeof(gps[0]);
+  size_t gps_count;
+  char** gps = read_filenames(&gps_count);
   printf("Bienvenue dans le logiciel de gestion de Grand Prix !\n");
 
   if (!strcmp(action, "start")) {
@@ -77,13 +77,18 @@ char* input_name(char* action) {
     validate_not_exists("Veuillez entrer le nom du Grand Prix (30 caractères maximum) : ", gp, gps, gps_count);
   } else {
     // Propose les noms de Grand Prix en cours et récupère le nom correspondant à l'index entré
-    // TODO : implémenter les fonctions de recherche de fichiers
     printf("Voici vos options :\n");
     for (size_t i = 0; i < gps_count; i++) {
       printf("  [%d] %s\n", i, gps[i]);
     }
-    int gp_index = validate_int("Veuillez sélectionner un grand prix : ", gps_count);
+    int gp_index = validate_in_range("Veuillez sélectionner un grand prix : ", gps_count);
     strcpy(gp, gps[gp_index]); // Place le nom du grand prix sélectionné dans la variable gp
+    
+    // Libération de la mémoire allouée pour les noms de Grand Prix une fois que la chaine de caractère est récupérée
+    for (size_t i = 0; i < gps_count; i++) {
+      free(gps[i]);
+    }
+    free(gps);
   }
   return gp;
 }
@@ -95,11 +100,11 @@ int start(char* gp) {
 
 int next(char* gp) {
   // gp possède déjà un ou plusieurs fichiers existant car le nom a déjà été vérifié
-  // TODO : trouver le fichier de valeur la plus haute pour ce gp
-  return 1; 
+  return read_highest_phase(gp) + 1;
 }
 
 int cancel(char* gp) {
+  // Supprime les fichiers correspondant au gp
   return 0;
 }
 
