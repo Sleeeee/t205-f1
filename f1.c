@@ -26,7 +26,8 @@ int main(int argc, char *argv[]){
   }
 
   char* gp = input_name(argv[1]);
-  int phase = find_phase(argv[1]);
+  int phase = find_phase(argv[1], gp);
+  printf("%s\n", gp);
   if (phase == -1) {
     perror("Erreur de recherche de la phase à exécuter");
     exit(1);
