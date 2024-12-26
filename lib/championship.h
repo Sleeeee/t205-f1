@@ -6,17 +6,17 @@
  *   - 4 : Q1 (18min)
  *   - 5 : Q2 (15min)
  *   - 6 : Q3 (12min)
- *   - 7 : Course
+ *   - 7 : Course (~305km -> ~60 tours)
  * Phases d'un GP spécial : 
  *   - 11 : P1 (1h)
  *   - 12 : Q1 (12min)
  *   - 13 : Q2 (10min)
  *   - 14 : Q3 (8min)
- *   - 15 : Sprint (100km)
+ *   - 15 : Sprint (~100km -> ~20 tours)
  *   - 16 : Q1 (18min)
  *   - 17 : Q2 (15min)
  *   - 18 : Q3 (12min)
- *   - 19 : Course
+ *   - 19 : Course (~305km -> ~60 tours)
 */
 
 int validate_input(char* message, char one, char two) {
