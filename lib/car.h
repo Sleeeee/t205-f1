@@ -5,6 +5,40 @@ void init_globalmemory(globalmemory* global_shm) {
   }
 }
 
+void init_timer(int phase, globalmemory* global_shm) {
+  int time;
+  switch (phase) {
+    case 1:
+    case 2:
+    case 3:
+    case 11:
+      time = 3600000;
+      break;
+    case 4:
+    case 16:
+      time = 18000;
+      break;
+    case 5:
+    case 17:
+      time = 15000;
+      break;
+    case 6:
+    case 12:
+    case 18:
+      time = 12000;
+      break;
+    case 13:
+      time = 10000;
+      break;
+    case 14:
+      time = 8000;
+      break;
+    default:
+      time = -1000;
+  }
+  global_shm->time_left = time;
+}
+
 void init_car(int id, int car_num, int sem_id, globalmemory* global_shm, int phase) {
   // Définition de la seed aléatoire basée sur le pid
   srand(time(NULL) ^ (getpid()));

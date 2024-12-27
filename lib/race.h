@@ -47,33 +47,33 @@ int run_lap(int car_id, int car_num, globalmemory* global_shm, int sem_id) {
 }
 
 void start_practice(int car_id, int car_num, globalmemory* global_shm, int sem_id) {
-  int time_left = 3600000; // 1 heure en ms
-  while (time_left > 0) {
-    int wants_to_run = random_int(0, 1);
+  int wants_to_run;
+  while (global_shm->time_left > 0) {
+    wants_to_run = random_int(0, 1);
     if (wants_to_run) {
       // Court entre 5 et 10 tours
       int laps_to_run = random_int(5, 10);
       for (int i = 0; i < laps_to_run; i++) {
-        if (time_left > 45000) {
+        if (global_shm->time_left > 45000) {
           // S'il reste au moins 45 secondes, la voiture peut démarrer
           int lap_time = run_lap(car_id, car_num, global_shm, sem_id);
-          time_left -= lap_time;
+          if (lap_time < global_shm->cars[car_id].time_best) {
+            global_shm->cars[car_id].time_best = lap_time;
+          }
+          global_shm->cars[car_id].laps_count++;
         } else {
           // S'il ne reste plus assez de temps pour courir le prochain tour, retour au stands
-          wait_stands(time_left, car_id, global_shm);
-          time_left = 0;
+          wait_stands(global_shm->cars[car_id].time_total, car_id, global_shm);
         }
       }
     } else {
       // Attend pendant 5 à 10 minutes
-      int time_to_wait = random_int(300, 600);
-      if (time_left > time_to_wait) {
+      int time_to_wait = random_int(300000, 600000);
+      if (global_shm->time_left > time_to_wait) {
         // Si l'horloge permet d'attendre aussi longtemps
         wait_stands(time_to_wait, car_id, global_shm);
-        time_left -= time_to_wait;
       } else {
-        wait_stands(time_left, car_id, global_shm);
-        time_left = 0;
+        wait_stands(global_shm->cars[car_id].time_total, car_id, global_shm);
       }
     }
   }

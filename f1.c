@@ -58,6 +58,8 @@ int main(int argc, char *argv[]){
     exit(1);
   }
   init_globalmemory(global_shm);
+  // Initialisation d'un timer si nécessaire (-1000 si non applicable)
+  init_timer(phase, global_shm);
 
   // Initialisation d'un sémaphore pour la synchronisation des processus
   int sem_id = semget(IPC_PRIVATE, 1, IPC_CREAT | 0666);
@@ -82,23 +84,34 @@ int main(int argc, char *argv[]){
     }
   }
 
+  // Décompte du chrono et affichage
   int cars_running = CAR_COUNT;
   globalmemory shm_copy[CAR_COUNT];
   // Tant qu'il y a encore des voitures en course
   while (cars_running > 0) {
+    // Petite sieste et décompte du chrono
     sleep(1);
+    if (global_shm->time_left != -1000) {
+      // -1000 est la valeur obtenue lors des phases n'utilisant pas de timer
+      global_shm->time_left -= TIME_DIV; // Décrément de 1000ms en équivalent accéléré
+    }
+
     cars_running = 0;
     memcpy(shm_copy, global_shm, sizeof(globalmemory)); // Copie locale de la shared memory
     sort_cars(shm_copy->cars, CAR_COUNT, phase); // Tri de l'attribut cars de la copie locale
     display_refresh(); // clear
+    display_header(phase);
     // Comptage du nombre de voitures en course et affichage des résultats triés
     for (int i = 0; i < CAR_COUNT; i++) {
-      display_car(shm_copy->cars[i]);
+      display_car(phase, i, shm_copy->cars);
       if (shm_copy->cars[i].status == 1) {
         cars_running += 1;
       }
     }
     display_sectors(shm_copy->sector_best); // Affichage des temps des meilleurs secteurs
+    if (global_shm->time_left != -1000) {
+      display_timer(global_shm->time_left);
+    }
   }
 
   // Le processus père attend la terminaison des processus fils
