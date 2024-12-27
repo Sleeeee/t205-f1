@@ -46,18 +46,19 @@ int main(int argc, char *argv[]){
   }
   printf("Initialisation de la phase %d du Grand Prix de %s\n", phase, gp);
 
-  // Définition d'une shared memory pouvant contenir NUM_CARS structures voitures
-  int shm_id = shmget(IPC_PRIVATE, CAR_COUNT * sizeof(car), IPC_CREAT | 0666);
+  // Définition d'une shared memory pouvant contenir la structure globalmemory
+  int shm_id = shmget(IPC_PRIVATE, sizeof(globalmemory), IPC_CREAT | 0666);
   if (shm_id == -1) {
     perror("Erreur d'initialisation de la shared memory");
     exit(1);
   }
-  // Attachement de la shm et changement de type en un array de voitures
-  car *cars_shm = (car *) shmat(shm_id, NULL, 0);
-  if (cars_shm == (car *)-1) {
+  // Attachement de la shm et casting du type en structure prédéfinie
+  globalmemory* global_shm = (globalmemory *) shmat(shm_id, NULL, 0);
+  if (global_shm == (globalmemory *)-1) {
     perror("Erreur d'attachement de la shared memory");
     exit(1);
   }
+  init_globalmemory(global_shm);
 
   // Initialisation d'un sémaphore pour la synchronisation des processus
   int sem_id = semget(IPC_PRIVATE, 1, IPC_CREAT | 0666);
@@ -76,28 +77,29 @@ int main(int argc, char *argv[]){
       exit(1);
     } else if (pid == 0) {
       // Le processus fils initialise la voiture en lui donnant un numéro de voiture, l'identifiant du sémaphore et le pointeur vers la shm
-      init_car(i, CAR_NUMS[i], sem_id, cars_shm, phase);
-      shmdt(cars_shm); // Détachement de la shm du processus fils
+      init_car(i, CAR_NUMS[i], sem_id, global_shm, phase);
+      shmdt(global_shm); // Détachement de la shm du processus fils
       exit(0);
     }
   }
 
   int cars_running = CAR_COUNT;
-  car cars_copy[CAR_COUNT];
+  globalmemory shm_copy[CAR_COUNT];
   // Tant qu'il y a encore des voitures en course
   while (cars_running > 0) {
     sleep(1);
     cars_running = 0;
-    memcpy(cars_copy, cars_shm, sizeof(car) * CAR_COUNT); // Copie locale de la shared memory
-    sort_cars(cars_copy, CAR_COUNT, phase); // Tri de la copie locale
+    memcpy(shm_copy, global_shm, sizeof(globalmemory)); // Copie locale de la shared memory
+    sort_cars(shm_copy->cars, CAR_COUNT, phase); // Tri de l'attribut cars de la copie locale
     display_refresh(); // clear
-    // On compte le nombre de voitures en course et on affiche les résultats triés
+    // Comptage du nombre de voitures en course et affichage des résultats triés
     for (int i = 0; i < CAR_COUNT; i++) {
-      display_car(cars_copy[i]);
-      if (cars_copy[i].status == 1) {
+      display_car(shm_copy->cars[i]);
+      if (shm_copy->cars[i].status == 1) {
         cars_running += 1;
       }
     }
+    display_sectors(shm_copy->sector_best); // Affichage des temps des meilleurs secteurs
   }
 
   // Le processus père attend la terminaison des processus fils
@@ -113,14 +115,8 @@ int main(int argc, char *argv[]){
   
   // Libération du sémaphore
   semctl(sem_id, 0, IPC_RMID);
-
-  // Lecture de la shm
-  for (int i = 0; i < CAR_COUNT; i++) {
-    printf("Id : %d / time : %d\n", cars_shm[i].id, cars_shm[i].time_total);
-  }
-
   // Détachement de la shm du processus père et libération de l'espace
-  shmdt(cars_shm);
+  shmdt(global_shm);
   shmctl(shm_id, IPC_RMID, NULL);
   free(gp);
 

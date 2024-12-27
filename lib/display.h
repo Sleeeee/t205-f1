@@ -6,6 +6,13 @@ void display_car(car car) {
   printf("car %d, %d laps, best lap %d, time total %d, s1 %d, s2 %d, s3 %d, status %d\n", car.id, car.laps_count, car.time_best, car.time_total, car.time_sectors[0], car.time_sectors[1], car.time_sectors[2], car.status);
 }
 
+void display_sectors(sectorbest* sector_best) {
+  for (int i = 0; i < 3; i++) {
+    printf("secteur %d, car %d, time %d / ", i+1, sector_best[i].car_id, sector_best[i].time);
+  }
+  printf("\n");
+}
+
 void sort_fastest_lap(car* cars, int count) {
   for (int i = 0; i < count - 1; i++) {
     for (int j = 0; j < count - i - 1; j++) {
