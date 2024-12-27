@@ -24,8 +24,12 @@ int CAR_NUMS[20]; // Pas d'alloation dynamique
 int main(int argc, char *argv[]){
   // Lancement du programme et recherche de la phase à exécuter
   if (argc != 2) {
-    perror("Veuillez entrer un et un seul argument : start / next / cancel");
+    perror("Veuillez entrer un et un seul argument : start / next / cancel / results");
     exit(1);
+  }
+  if (!strcmp(argv[1], "results")) {
+    // TODO : afficher les résultats de la saison
+    exit(0);
   }
 
   char* gp = input_name(argv[1]);
@@ -35,6 +39,9 @@ int main(int argc, char *argv[]){
     exit(1);
   } else if (phase == 0) {
     // Si l'instruction était "cancel"
+    exit(0);
+  } else if ((phase > 7 && phase < 11) || (phase > 19)) {
+    printf("Ce Grand Prix est terminé, veuillez relocaliser les fichiers ou ignorer cette option\n");
     exit(0);
   }
   printf("Initialisation de la phase %d du Grand Prix de %s\n", phase, gp);

@@ -6,34 +6,28 @@ int lap(int car_id, car* cars_shm) {
     int t = random_int(25, 45);
     cars_shm[car_id].time_sectors[i] = t;
     total += t;
-    sleep(t / 10);
+    sleep(t / 20);
   }
-  cars_shm[car_id].time_total += total;
-  cars_shm[car_id].laps_count++;
   return total;
 }
 
-// TODO : à supprimer
-void race(int num_laps, int car_id, car* cars_shm) {
-  int t;
-  for (int i = 0; i < num_laps; i++) {
-    // Parcourt un tour et modifie le meilleur temps si nécessaire
-    if ((t = lap(car_id ,cars_shm)) < cars_shm[car_id].time_best) {
-      cars_shm[car_id].time_best = t;
-    }
-  }
-}
-
 void start_practice(int car_id, car* cars_shm) {
-
+  printf("practicing\n");
 }
 
 void start_qualif(int time_min, int car_id, car* cars_shm) {
-
+  printf("qualifying\n");
 }
 
 void start_race(int num_laps, int car_id, car* cars_shm) {
-
+  int t;
+  for (int i = 0; i < num_laps; i++) {
+    if ((t = lap(car_id ,cars_shm)) < cars_shm[car_id].time_best) {
+      cars_shm[car_id].time_best = t;
+    }
+    cars_shm[car_id].time_total += t;
+    cars_shm[car_id].laps_count++;
+  }
 }
 
 void start_phase(int car_id, car* cars_shm, int phase) {
