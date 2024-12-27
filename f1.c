@@ -114,6 +114,10 @@ int main(int argc, char *argv[]){
     }
   }
 
+  // Enregistrement des résultats
+  printf("Enregistrement des résultats\n");
+  write_results(gp, phase, shm_copy);
+
   // Le processus père attend la terminaison des processus fils
   for (int i = 0; i < CAR_COUNT; i++) {
     int status;

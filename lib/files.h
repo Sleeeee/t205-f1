@@ -70,3 +70,9 @@ void fetch_contestants(char* gp, int phase, int* car_count, int* car_nums) {
     car_nums[i] = INITIAL_CAR_NUMS[i];
   }
 }
+
+void write_results(char* gp, int phase, globalmemory* shm_copy) {
+  // TODO : écrire les résultats dans le fichier (ex: gp=Dubai phase=4 -> Dubai_4.txt ou csv ou peu importe)
+  printf("Résultats écrits dans le fichier avec succès\n");
+}
+
