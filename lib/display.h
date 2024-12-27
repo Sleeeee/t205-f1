@@ -3,33 +3,78 @@ void display_refresh() {
 }
 
 void display_header(int phase) {
-  printf("%-9s %-7s %-15s %-9s %-8s\n", "Voiture", "Tours", "Meilleur tour", "Diff", "Statut");
+  char phase_name[7];
+  switch (phase) {
+
+  }
+  printf("%-9s %-7s %-7s %-9s %-8s\n", "Voiture", "Tours", "Temps", "Diff", "Statut");
+}
+
+int get_time_diff(int i, int car_time, int previous_time) {
+  int diff;
+  if (!i) {
+    diff = 0;
+  } else if (car_time == 1000000) {
+    diff == 1000000;
+  } else {
+    diff = car_time - previous_time;
+  }
+  return diff;
+}
+
+char* get_status(int status) {
+  static char status_name[7];
+  switch (status) {
+    case 0:
+    case 2:
+      strcpy(status_name, "STANDS");
+      break;
+    case 1:
+      strcpy(status_name, "COURSE");;
+      break;
+    case 3:
+      strcpy(status_name, "OUT");;
+      break;
+  }
+  return status_name;
+}
+
+void display_practice_qualif(int phase, int i, car* cars) {
+  int diff = get_time_diff(i, cars[i].time_best, cars[i-1].time_best); // La différence se calcule sur le temps du meilleur tour
+  char* status = get_status(cars[i].status);
+  printf("%-9d %-7d %-7.3f %-9.3f %-8s\n", cars[i].id, cars[i].laps_count, (float) cars[i].time_best/1000, (float) diff/1000, status);
+}
+
+void display_race(int phase, int i, car* cars) {
+  // TODO : fix les différences négatives
+  int diff = get_time_diff(i, cars[i].time_total, cars[i-1].time_total); // La différence se calcule sur le temps total
+  char* status = get_status(cars[i].status);
+  printf("%-9d %-7d %-7.3f %-9.3f %-8s\n", cars[i].id, cars[i].laps_count, (float) cars[i].time_total/1000, (float) diff/1000, status);
 }
 
 void display_car(int phase, int i, car* cars) {
-  int diff;
-  char status[7];
-
-  if (!i) {
-    diff = 0;
-  } else if (cars[i].time_best == 1000000) {
-    diff = 1000000;
-  } else {
-    diff = (cars[i].time_best - cars[i-1].time_best);
-  }
-  switch (cars[i].status) {
-    case 0:
-    case 2:
-      strcpy(status, "STANDS");
-      break;
+  switch (phase) {
     case 1:
-      strcpy(status, "COURSE");;
-      break;
+    case 2:
     case 3:
-      strcpy(status, "OUT");;
+    case 4:
+    case 5:
+    case 6:
+    case 11:
+    case 12:
+    case 13:
+    case 14:
+    case 16:
+    case 17:
+    case 18:
+      display_practice_qualif(phase, i, cars);
+      break;
+    case 7:
+    case 15:
+    case 19:
+      display_race(phase, i, cars);
       break;
   }
-  printf("%-9d %-7d %-15.3f %-9.3f %-8s\n", cars[i].id, cars[i].laps_count, (float) cars[i].time_best/1000, (float) diff/1000, status);
 }
 
 void display_sectors(sectorbest* sector_best) {
