@@ -14,9 +14,7 @@ void init_car(int id, int car_num, int sem_id, globalmemory* global_shm, int pha
   global_shm->cars[id].laps_count = 0;
   global_shm->cars[id].time_total = 0;
   global_shm->cars[id].time_best = 1000000; // Temps plus long que ce qu'il est possible d'effectuer pour assurer la réécriture
-  // Lancement de la course
-  global_shm->cars[id].status = 1;
-  start_phase(id, global_shm, sem_id, phase);
-  global_shm->cars[id].status = 0;
+
+  start_phase(id, car_num, global_shm, sem_id, phase); // Lancement de la phase adéquate
 }
 

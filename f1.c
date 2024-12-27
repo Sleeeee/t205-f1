@@ -14,7 +14,6 @@
 #include "lib/files.h"
 #include "lib/championship.h"
 #include "lib/display.h"
-#include "lib/sector.h"
 #include "lib/race.h"
 #include "lib/car.h"
 
