@@ -3,12 +3,12 @@ void display_refresh() {
 }
 
 void display_car(car car) {
-  printf("car %d, %d laps, best lap %d, time total %d, s1 %d, s2 %d, s3 %d, status %d\n", car.id, car.laps_count, car.time_best, car.time_total, car.time_sectors[0], car.time_sectors[1], car.time_sectors[2], car.status);
+  printf("car %d, %d laps, best lap %.3f, time total %.3f, s1 %.3f, s2 %.3f, s3 %.3f, status %d\n", car.id, car.laps_count, (float) car.time_best/1000, (float) car.time_total/1000, (float) car.time_sectors[0]/1000, (float) car.time_sectors[1]/1000, (float) car.time_sectors[2]/1000, car.status);
 }
 
 void display_sectors(sectorbest* sector_best) {
   for (int i = 0; i < 3; i++) {
-    printf("secteur %d, car %d, time %d / ", i+1, sector_best[i].car_id, sector_best[i].time);
+    printf("secteur %d, car %d, time %.3f / ", i+1, sector_best[i].car_id, (float) sector_best[i].time/1000);
   }
   printf("\n");
 }
