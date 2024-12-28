@@ -19,11 +19,12 @@ typedef struct car {
 typedef struct {
   int car_id;
   int time;
-} sectorbest;
+} besttime;
 
 typedef struct {
   car cars[INITIAL_CAR_COUNT];
-  sectorbest sector_best[3];
+  besttime sector_best[3];
+  besttime best_lap;
   int time_left;
 } globalmemory;
 
