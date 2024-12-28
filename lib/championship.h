@@ -193,6 +193,7 @@ void results_season() {
 
 void results_gp(char* gp) {
   printf("Résultats pour %s\n", gp);
+  read_results_gp(gp);
 }
 
 int results() {

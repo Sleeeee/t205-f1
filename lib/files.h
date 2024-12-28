@@ -1,3 +1,40 @@
+char * get_phase_name(int phase) {
+  char phase_name[7];
+  switch (phase) {
+    case 1:
+    case 11:
+      strcpy(phase_name, "P1");
+      break;
+    case 2:
+      strcpy(phase_name, "P2");
+      break;
+    case 3:
+      strcpy(phase_name, "P3");
+      break;
+    case 4:
+    case 12:
+    case 16:
+      strcpy(phase_name, "Q1");
+      break;
+    case 5:
+    case 13:
+    case 17:
+      strcpy(phase_name, "Q2");
+      break;
+    case 6:
+    case 14:
+    case 18:
+      strcpy(phase_name, "Q3");
+      break;
+    case 7:
+    case 19:
+      strcpy(phase_name, "Course");
+      break;
+    case 15:
+      strcpy(phase_name, "Sprint");
+  }
+}
+
 char* get_path(char* gp, int phase) {
     // Taille nécessaire : "results/" + gp + _ + phase (2 chiffres) + ".txt" + '\0'
     size_t path_size = strlen(gp) + 16;
@@ -192,12 +229,46 @@ void read_results_season(int* points) {
             case 5:
               p = 8 - ((i-4) * 2);
               break;
-            default:
-              p = 5 - ((i-6) * 1);
+            case 6:
+              p = 5;
+              break;
+            case 7:
+              p = 3;
+              break;
+            case 8:
+              p = 2;
+              break;
+            case 9:
+              p = 1;
+              break;
           }
           for (int j = 0; j < INITIAL_CAR_COUNT; j++) {
             if (INITIAL_CAR_NUMS[j] == car_nums[i]) {
               points[j] += p;
+            }
+          }
+        }
+        FILE *file = fopen(path, "r");
+        char line[64];
+        if (file != NULL) {
+          int current_line = 0;
+          while (fgets(line, sizeof(line), file)) {
+            current_line++;
+            if (current_line == 5) {
+            char* comma = strchr(line, ',');
+              if (comma != NULL) {
+                int car_id = atoi(comma + 1);
+                for (int i = 0; i < 10; i++) {
+                  if (car_nums[i] == car_id) {
+                    for (int j = 0; j < INITIAL_CAR_COUNT; j++) {
+                      if (INITIAL_CAR_NUMS[j] == car_nums[i]) {
+                        points[j] += 1;
+                      }
+                    }
+                  }
+                }
+              }
+              break;
             }
           }
         }
@@ -208,5 +279,39 @@ void read_results_season(int* points) {
 }
 
 void read_results_gp(char* gp) {
-
+  FILE *file;
+  int phase = 1;
+  char* path = get_path(gp, phase);
+  file = fopen(path, "r");
+  while (file != NULL) {
+    char line[64];
+    int position = 0;
+    if (fgets(line, sizeof(line), file) != NULL) {
+      char* token = strtok(line, ",");
+      char* phase_name = get_phase_name(phase);
+      printf("Phase %s\n", phase_name);
+      while (token != NULL) {
+        printf("%d. Voiture %s", ++position, token);
+        token = strtok(NULL, ",");
+        printf("\n");
+      }
+      for (int i = 0; i < 4; i++) {
+        if (fgets(line, sizeof(line), file) != NULL) {
+          char* time_string = strtok(line, ",");
+          char* car_id = strtok(NULL, ",");
+          if ((time != NULL) && (car_id != NULL)) {
+            int time = atoi(time_string);
+            if (i == 3) {
+              printf("Meilleur tour : %.3f secondes - Voiture %s\n", (float) time/1000, car_id);
+            } else {
+              printf("Meilleur temps du secteur %d : %.3f secondes - Voiture %s\n", i+1, (float) (time%60000)/1000, car_id);
+            }
+          }
+        }
+      }
+    }
+    // Tentative d'ouverture du prochain fichier
+    path = get_path(gp, ++phase);
+    file = fopen(path, "r");
+  }
 }
