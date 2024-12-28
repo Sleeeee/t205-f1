@@ -115,7 +115,7 @@ void start_race(int num_laps, int car_id, int car_num, globalmemory* global_shm,
   free(stand_laps);
 }
 
-void start_phase(int car_id, int car_num, globalmemory* global_shm, int sem_id, int phase) {
+void start_phase(int car_id, int car_num, globalmemory* global_shm, int sem_id, int phase, int circuit_length) {
   switch (phase) {
     // Essais libres
     case 1:
