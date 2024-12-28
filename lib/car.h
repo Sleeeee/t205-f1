@@ -2,6 +2,8 @@ void init_globalmemory(globalmemory* global_shm) {
   for (int i = 0; i < 3; i++) {
     global_shm->sector_best[i].car_id = -1;
     global_shm->sector_best[i].time = 1000000;
+    global_shm->best_lap.car_id = -1;
+    global_shm->best_lap.time = 1000000;
   }
 }
 
