@@ -9,7 +9,7 @@ void wait_stands(int time, int car_id, globalmemory* global_shm) {
 
 int run_sector(int car_id, globalmemory* global_shm) {
   // Probabilité de crash
-  if (!(rand() % 999)) {
+  if (!(rand() % 750)) {
     global_shm->cars[car_id].status = 3;
     exit(0);
   }
@@ -46,6 +46,21 @@ int run_lap(int car_id, int car_num, globalmemory* global_shm, int sem_id) {
     total += t;
     sleep(t / TIME_DIV);
   }
+  // Même opération avec le sémaphore pour mettre à jour le meilleur tour
+    if (total < global_shm->best_lap.time) {
+      if (semop(sem_id, &lock, 1) == -1) {
+        perror("Erreur de blocage du sémaphore");
+        exit(1);
+      }
+      if (total < global_shm->best_lap.time) {
+        global_shm->best_lap.time = total;
+        global_shm->best_lap.car_id = car_num;
+      }
+      if (semop(sem_id, &unlock, 1) == -1) {
+        perror("Erreur de déblocage du sémaphore");
+        exit(1);
+      }
+    }
   return total;
 }
 

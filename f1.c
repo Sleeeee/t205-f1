@@ -103,7 +103,7 @@ int main(int argc, char *argv[]){
     memcpy(shm_copy, global_shm, sizeof(globalmemory)); // Copie locale de la shared memory
     sort_cars(shm_copy->cars, CAR_COUNT, phase); // Tri de l'attribut cars de la copie locale
     display_refresh(); // clear
-    display_header(phase);
+    display_header(gp, phase);
     // Comptage du nombre de voitures en course et affichage des résultats triés
     for (int i = 0; i < CAR_COUNT; i++) {
       display_car(phase, i, shm_copy->cars);
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]){
         cars_running += 1;
       }
     }
-    display_sectors(shm_copy->sector_best); // Affichage des temps des meilleurs secteurs
+    display_best_times(shm_copy->sector_best, shm_copy->best_lap); // Affichage des temps des meilleurs secteurs et du meilleur tour
     if (global_shm->time_left != -1000) {
       display_timer(global_shm->time_left);
     }

@@ -129,8 +129,15 @@ void write_results(char* gp, int phase, globalmemory* shm_copy, int car_count) {
     fprintf(file, "%d", shm_copy->cars[i].id);
   }
   fprintf(file, "\n");
-  // TODO : écrire les meilleurs temps et autres infos
-  printf("Résultats écrits dans le fichier %s avec succès\n", gp);
+  // Meilleurs temps de secteurs
+  for (int i = 0; i < 3; i++) {
+    fprintf(file, "%d,", shm_copy->sector_best[i].time);
+    fprintf(file, "%d\n", shm_copy->sector_best[i].car_id);
+  }
+  // Meilleur tour
+  fprintf(file, "%d,", shm_copy->best_lap.time);
+  fprintf(file, "%d\n", shm_copy->best_lap.car_id);
+  printf("Résultats écrits dans le fichier %s avec succès\n", path);
 }
 
 void delete_results(char* gp) {

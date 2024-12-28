@@ -2,11 +2,42 @@ void display_refresh() {
   printf("\033[H\033[J"); // Caractère de rafraichissement de l'affichage
 }
 
-void display_header(int phase) {
+void display_header(char* gp, int phase) {
   char phase_name[7];
   switch (phase) {
-
+    case 1:
+    case 11:
+      strcpy(phase_name, "P1");
+      break;
+    case 2:
+      strcpy(phase_name, "P2");
+      break;
+    case 3:
+      strcpy(phase_name, "P3");
+      break;
+    case 4:
+    case 12:
+    case 16:
+      strcpy(phase_name, "Q1");
+      break;
+    case 5:
+    case 13:
+    case 17:
+      strcpy(phase_name, "Q2");
+      break;
+    case 6:
+    case 14:
+    case 18:
+      strcpy(phase_name, "Q3");
+      break;
+    case 7:
+    case 19:
+      strcpy(phase_name, "Course");
+      break;
+    case 15:
+      strcpy(phase_name, "Sprint");
   }
+  printf("Grand Prix de %s - Phase %s (%d)\n", gp, phase_name, phase);
   printf("%-9s %-7s %-7s %-9s %-8s\n", "Voiture", "Tours", "Temps", "Diff", "Statut");
 }
 
@@ -76,10 +107,11 @@ void display_car(int phase, int i, car* cars) {
   }
 }
 
-void display_sectors(sectorbest* sector_best) {
+void display_best_times(besttime* sector_best, besttime best_lap) {
   for (int i = 0; i < 3; i++) {
-    printf("Secteur %d : %.3f par voiture %d\n", i+1, (float) sector_best[i].time/1000, sector_best[i].car_id);
+    printf("Secteur %d : %.3f - voiture %d\n", i+1, (float) sector_best[i].time/1000, sector_best[i].car_id);
   }
+  printf("Meilleur tour : %.3f - voiture %d\n", (float) best_lap.time/1000, best_lap.car_id);
 }
 
 void display_timer(int time_ms) {
