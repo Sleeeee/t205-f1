@@ -120,8 +120,30 @@ int get_car_count(int phase) {
 
 void fetch_contestants(char* gp, int phase, int* car_count, int* car_nums) {
   *car_count = get_car_count(phase); // Nombre de voitures pour la phase à lancer
-  char* path = get_path(gp, phase - 1); // Récupération des résultats de la phase précédente
-  read_contestants(path, car_nums, *car_count); // Remplit car_nums
+  if ((phase == 7) || (phase == 15) || (phase == 19)) {
+    // Les courses récupèrent dans l'ordre les participants des étapes de qualifications
+    for (int i = 1; i < 4; i++) {
+      char* path = get_path(gp, phase - i);
+      int current_count;
+      int current_start;
+      switch (i) {
+        case 1:
+          // Q3
+          current_count = 10;
+          current_start = 0;
+          break;
+        default:
+          // Q1 / Q2
+          current_count = 5;
+          current_start = i * 5; // On prend les indices 10-14 de Q2 et 15-19 de Q1
+      }
+      read_contestants(path, &car_nums[current_start], current_start, current_count);
+    }
+  } else {
+    // Les autres phases récupèrent les car_count premiers de la phase précédente
+    char* path = get_path(gp, phase - 1);
+    read_contestants(path, car_nums, 0, *car_count); // Remplit car_nums de car_count voitures
+  }
 }
 
 int start(char* gp, int* car_count, int* car_nums) {

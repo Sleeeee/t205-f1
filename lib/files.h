@@ -1,6 +1,6 @@
-char* get_path(char* file_name, int phase) {
-    // Taille nécessaire : "results/" + file_name + _ + phase (2 chiffres) + ".txt" + '\0'
-    size_t path_size = strlen(file_name) + 16;
+char* get_path(char* gp, int phase) {
+    // Taille nécessaire : "results/" + gp + _ + phase (2 chiffres) + ".txt" + '\0'
+    size_t path_size = strlen(gp) + 16;
     char *path = malloc(path_size);
     if (path == NULL) {
         perror("Erreur d'allocation de mémoire\n");
@@ -10,7 +10,7 @@ char* get_path(char* file_name, int phase) {
     snprintf(phase_string, sizeof(phase_string), "_%02d", phase);
 
     strcpy(path, "results/");
-    strcat(path, file_name);
+    strcat(path, gp);
     strcat(path, phase_string);
     strcat(path, ".txt");
     return path;
@@ -81,7 +81,7 @@ int read_highest_phase(char* gp) {
   return highest_phase;
 }
 
-void read_contestants(char* path, int* car_nums, int count) {
+void read_contestants(char* path, int* car_nums, int start, int count) {
   FILE *file = fopen(path, "r");
   if (file == NULL) {
     perror("Erreur d'ouverture du fichier");
@@ -94,23 +94,47 @@ void read_contestants(char* path, int* car_nums, int count) {
     exit(1);
   }
   char* token = strtok(line, ",");
-  int i = 0;
-  // Tant qu'on trouve des virgules
-  while (token != NULL && i < count) {
+  // Passe les start premières valeurs
+  for (int i = 0; i < start; i++) {
+    token = strtok(NULL, ",");
+    if (token == NULL) {
+      perror("Erreur de parsing des valeurs du fichier");
+      exit(1);
+    }
+  }
+  // Récupère les count valeurs suivantes et les insère dans l'array donné en pointeur
+  for (int i = 0; i < count; i++) {
+    if (token == NULL) {
+      perror("Erreur de parsing des valeurs du fichier");
+      exit(1);
+    }
     car_nums[i] = atoi(token); // On insère le nombre parsé dans CAR_NUMS
-    i++;
     token = strtok(NULL, ",");
   }
   fclose(file);
 }
 
 void write_results(char* gp, int phase, globalmemory* shm_copy, int car_count) {
-  // TODO : écrire les résultats dans le fichier (ex: gp=Dubai phase=4 -> Dubai_4.txt ou csv ou peu importe)
   // On écrit seulement le nombre de voitures ayant participé même si la shm a 20 places allouées
-  printf("Résultats écrits dans le fichier avec succès\n");
+  char* path = get_path(gp, phase);
+  FILE *file = fopen(path, "w");
+  if (file == NULL) {
+    perror("Erreur d'ouverture du fichier");
+    exit(1);
+  }
+  for (int i = 0; i < car_count; i++) {
+    if (i) {
+      fprintf(file, ","); // Virgule avant le numéro de voiture si ce n'est pas la première
+    }
+    fprintf(file, "%d", shm_copy->cars[i].id);
+  }
+  fprintf(file, "\n");
+  // TODO : écrire les meilleurs temps et autres infos
+  printf("Résultats écrits dans le fichier %s avec succès\n", gp);
 }
 
 void delete_results(char* gp) {
+  // TODO : supprimer tous les fichiers correspondant au GP
   return;
 }
 
