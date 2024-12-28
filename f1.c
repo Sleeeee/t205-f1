@@ -26,8 +26,10 @@ int main(int argc, char *argv[]){
     perror("Veuillez entrer un et un seul argument : start / next / cancel / results");
     exit(1);
   }
+  printf("Bienvenue dans le logiciel de gestion de Grand Prix !\n");
   if (!strcmp(argv[1], "results")) {
     // TODO : afficher les résultats de la saison
+    results();
     exit(0);
   }
 
@@ -119,7 +121,7 @@ int main(int argc, char *argv[]){
 
   write_results(gp, phase, shm_copy, CAR_COUNT); // Enregistrement des résultats
 
-  // Le processus père attend la terminaison des processus fils
+  // Le processus père attend la terminaison des processus fils et affiche s'il se sont terminés correctement
   for (int i = 0; i < CAR_COUNT; i++) {
     int status;
     pid_t child_pid = wait(&status);

@@ -70,7 +70,6 @@ char* input_name(char* action) {
   char *gp = malloc(31 * sizeof(char));
   size_t gps_count;
   char** gps = read_filenames(&gps_count);
-  printf("Bienvenue dans le logiciel de gestion de Grand Prix !\n");
 
   if (!strcmp(action, "start")) {
     // Créée un nouveau nom et vérifie qu'il n'existe pas
@@ -118,9 +117,20 @@ int get_car_count(int phase) {
   return count;
 }
 
+void fetch_initial_contestants(int* car_count, int* car_nums) {
+  // Copie des variables des participants
+  *car_count = INITIAL_CAR_COUNT;
+  for (size_t i = 0; i < INITIAL_CAR_COUNT; i++) {
+    car_nums[i] = INITIAL_CAR_NUMS[i];
+  }
+}
+
 void fetch_contestants(char* gp, int phase, int* car_count, int* car_nums) {
   *car_count = get_car_count(phase); // Nombre de voitures pour la phase à lancer
-  if ((phase == 7) || (phase == 15) || (phase == 19)) {
+  // Phases où tout le monde participe peu importe l'ordre
+  if ((phase == 2) || (phase == 3) || (phase == 4) || (phase == 11) || (phase == 12) || (phase == 16)) {
+    fetch_initial_contestants(car_count, car_nums);
+  } else if ((phase == 7) || (phase == 15) || (phase == 19)) {
     // Les courses récupèrent dans l'ordre les participants des étapes de qualifications
     for (int i = 1; i < 4; i++) {
       char* path = get_path(gp, phase - i);
@@ -148,11 +158,7 @@ void fetch_contestants(char* gp, int phase, int* car_count, int* car_nums) {
 
 int start(char* gp, int* car_count, int* car_nums) {
   int is_special = validate_input("Quel type de championnat voulez-vous démarrer ? [C]lassique / [S]pecial", 'C', 'S');
-  // Copie des variables des participants
-  *car_count = INITIAL_CAR_COUNT;
-  for (size_t i = 0; i < INITIAL_CAR_COUNT; i++) {
-    car_nums[i] = INITIAL_CAR_NUMS[i];
-  }
+  fetch_initial_contestants(car_count, car_nums);
   return is_special * 10 + 1; // 1 si classique, 11 si spécial
 }
 
@@ -163,21 +169,38 @@ int next(char* gp, int* car_count, int* car_nums) {
   return phase;
 }
 
-int cancel(char* gp) {
-  // Supprime les fichiers correspondant au gp
-  delete_results(gp);
-  return 0;
-}
-
 int find_phase(char* action, char* gp, int* car_count, int* car_nums) {
   int phase;
   if (!strcmp(action, "start")) {
     phase = start(gp, car_count, car_nums);
   } else if (!strcmp(action, "next")) {
     phase = next(gp, car_count, car_nums);
-  } else if (!strcmp(action, "cancel")) {
-    phase = cancel(gp);
   }
   return phase;
 }
 
+void results_season() {
+  int points[INITIAL_CAR_COUNT];
+  for (int i = 0; i < INITIAL_CAR_COUNT; i++) {
+    points[i] = 0;
+  }
+  read_results_season(points);
+  printf("Résultats de la saison\n");
+  for (int i = 0; i < INITIAL_CAR_COUNT; i++) {
+    printf("Voiture %d : %d points\n", INITIAL_CAR_NUMS[i], points[i]);
+  }
+}
+
+void results_gp(char* gp) {
+  printf("Résultats pour %s\n", gp);
+}
+
+int results() {
+  int season = validate_input("Quels résultats voulez-vous afficher ? [G]rand Prix / [S]aison", 'G', 'S');
+  if (season) {
+    results_season();
+  } else {
+    char* gp = input_name("results");
+    results_gp(gp);
+  }
+}

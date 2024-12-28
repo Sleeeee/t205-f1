@@ -140,8 +140,73 @@ void write_results(char* gp, int phase, globalmemory* shm_copy, int car_count) {
   printf("Résultats écrits dans le fichier %s avec succès\n", path);
 }
 
-void delete_results(char* gp) {
-  // TODO : supprimer tous les fichiers correspondant au GP
-  return;
+void read_results_season(int* points) {
+  DIR *dir = opendir("./results");
+  if (dir == NULL) {
+    perror("Erreur d'ouverture du dossier ./results . Veuillez vous assurer qu'il existe avant de continuer");
+    exit(1);
+  }
+  int car_nums[INITIAL_CAR_COUNT];
+  struct dirent *entry;
+
+  while ((entry = readdir(dir)) != NULL) {
+    char* entry_name = entry->d_name;
+    if (entry_name[0] != '.') {
+      char* underscore = strchr(entry_name, '_');
+      if (underscore == NULL) {
+        perror("Format de fichier erroné");
+        exit(1);
+      }
+      int number = atoi(underscore + 1); // Parsing du nombre après l'underscore
+      if (number == 15) {
+        // Sprint
+        int p;
+        char path[32];
+        strcpy(path, "results/");
+        strcat(path, entry->d_name);
+        printf("%s\n", path);
+        read_contestants(path, car_nums, 0, 8);
+        for (int i = 0; i < 8; i++) {
+          for (int j = 0; j < INITIAL_CAR_COUNT; j++) {
+            if (INITIAL_CAR_NUMS[j] == car_nums[i]) {
+              points[j] += 8 - i;
+            }
+          }
+        }
+      } else if ((number == 7) || (number == 19)) {
+        // Courses
+        int p;
+        char path[32];
+        strcpy(path, "results/");
+        strcat(path, entry->d_name);
+        read_contestants(path, car_nums, 0, 10);
+        for (int i = 0; i < 10; i++) {
+          switch (i) {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+              p = 25 - (i * 5);
+              break;
+            case 4:
+            case 5:
+              p = 8 - ((i-4) * 2);
+              break;
+            default:
+              p = 5 - ((i-6) * 1);
+          }
+          for (int j = 0; j < INITIAL_CAR_COUNT; j++) {
+            if (INITIAL_CAR_NUMS[j] == car_nums[i]) {
+              points[j] += p;
+            }
+          }
+        }
+      }
+    }
+  }
+  closedir(dir);
 }
 
+void read_results_gp(char* gp) {
+
+}
