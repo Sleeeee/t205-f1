@@ -7,19 +7,22 @@ void wait_stands(int time, int car_id, globalmemory* global_shm) {
   sleep(time / TIME_DIV);
 }
 
-int run_sector() {
-  // TODO : implémenter la fonction et le crash
+int run_sector(int car_id, globalmemory* global_shm) {
+  // Probabilité de crash
+  if (!(rand() % 999)) {
+    global_shm->cars[car_id].status = 3;
+    exit(0);
+  }
   return random_int(25000, 45000);
 }
 
 int run_lap(int car_id, int car_num, globalmemory* global_shm, int sem_id) {
-  // TODO : implémenter le retour au stand
   global_shm->cars[car_id].status = 1; // Changement du statut
   int total = 0;
   // Exécution des trois secteurs
   for (int i = 0; i < 3; i++) {
     // Court un secteur, enregistre le temps, le processus dort une durée proportionnelle au temps couru
-    int t = run_sector();
+    int t = run_sector(car_id, global_shm);
     global_shm->cars[car_id].time_sectors[i] = t; // Zone mémoire non susceptible à être modifiée par un autre processus
     
     // Première vérification pour bloquer le sémaphore uniquement lorsque c'est nécessaire
@@ -47,10 +50,8 @@ int run_lap(int car_id, int car_num, globalmemory* global_shm, int sem_id) {
 }
 
 void start_practice_qualif(int time_sec, int car_id, int car_num, globalmemory* global_shm, int sem_id) {
-  int wants_to_run;
   while (global_shm->time_left > 0) {
-    wants_to_run = rand() % 2; // 50%
-    if (wants_to_run) {
+    if (rand() % 2) {
       // Court un nombre de tours proportionnel au temps de la phase
       int laps_to_run = random_int(max(1, time_sec/720), max(2, time_sec/360));
       for (int i = 0; i < laps_to_run; i++) {
@@ -80,20 +81,24 @@ void start_practice_qualif(int time_sec, int car_id, int car_num, globalmemory* 
   global_shm->cars[car_id].status = 0;
 }
 
-void start_race(int num_laps, int car_id, int car_num, globalmemory* global_shm, int sem_id) {
+void start_race(int num_laps, int car_id, int car_num, globalmemory* global_shm, int sem_id, int is_sprint) {
   int t;
   int* stand_laps = NULL; // Alloue initialement un entier
   int stand_count = 0;
-  
+  int first_iter = 1;
   // Génération des tours auxquels le pilote se rend aux stands (max 3)
   do {
-    int lap = random_int(1, num_laps);
-    stand_laps = realloc(stand_laps, (stand_count+1) * sizeof(int));
-    if (stand_laps == NULL) {
-      perror("Échec d'allocation de mémoire");
-      exit(1);
+    if (is_sprint && first_iter) {
+      first_iter = 0;
+    } else {
+      int lap = random_int(1, num_laps);
+      stand_laps = realloc(stand_laps, (stand_count+1) * sizeof(int));
+      if (stand_laps == NULL) {
+        perror("Échec d'allocation de mémoire");
+        exit(1);
+      }
+      stand_laps[stand_count] = lap;
     }
-    stand_laps[stand_count] = lap;
   } while ((rand() % 2) && ++stand_count < 3);
 
   for (int i = 0; i < num_laps; i++) {
@@ -145,11 +150,11 @@ void start_phase(int car_id, int car_num, globalmemory* global_shm, int sem_id, 
     // Course classique
     case 7:
     case 19:
-      start_race(300/circuit_length, car_id, car_num, global_shm, sem_id); // TODO : compter le nombre de tours selon la longueur du circuit
+      start_race(300/circuit_length, car_id, car_num, global_shm, sem_id, 0);
       break;
     // Course sprint
     case 15:
-      start_race(100/circuit_length, car_id, car_num, global_shm, sem_id);
+      start_race(100/circuit_length, car_id, car_num, global_shm, sem_id, 1);
       break;
   }
 }

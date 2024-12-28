@@ -97,6 +97,33 @@ int input_length() {
   return validate_in_range("Veuillez entrer la longueur du circuit en km (1-10) :", 10);
 }
 
+int get_car_count(int phase) {
+  int count;
+  switch (phase) {
+    // Q2
+    case 5:
+    case 13:
+    case 17:
+      count = 15;
+      break;
+    // Q3
+    case 6:
+    case 14:
+    case 18:
+      count = 10;
+      break;
+    default:
+      count = 20;
+  }
+  return count;
+}
+
+void fetch_contestants(char* gp, int phase, int* car_count, int* car_nums) {
+  *car_count = get_car_count(phase); // Nombre de voitures pour la phase à lancer
+  char* path = get_path(gp, phase - 1); // Récupération des résultats de la phase précédente
+  read_contestants(path, car_nums, *car_count); // Remplit car_nums
+}
+
 int start(char* gp, int* car_count, int* car_nums) {
   int is_special = validate_input("Quel type de championnat voulez-vous démarrer ? [C]lassique / [S]pecial", 'C', 'S');
   // Copie des variables des participants
@@ -109,13 +136,14 @@ int start(char* gp, int* car_count, int* car_nums) {
 
 int next(char* gp, int* car_count, int* car_nums) {
   // gp possède déjà un ou plusieurs fichiers existant car le nom a déjà été vérifié
-  int last_phase = read_highest_phase(gp);
-  fetch_contestants(gp, last_phase, car_count, car_nums); // Remplit les variables dont les pointeurs sont donnés
-  return last_phase + 1;
+  int phase = read_highest_phase(gp) + 1;
+  fetch_contestants(gp, phase, car_count, car_nums); // Remplit les variables dont les pointeurs sont donnés
+  return phase;
 }
 
 int cancel(char* gp) {
   // Supprime les fichiers correspondant au gp
+  delete_results(gp);
   return 0;
 }
 

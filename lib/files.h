@@ -1,3 +1,21 @@
+char* get_path(char* file_name, int phase) {
+    // Taille nécessaire : "results/" + file_name + _ + phase (2 chiffres) + ".txt" + '\0'
+    size_t path_size = strlen(file_name) + 16;
+    char *path = malloc(path_size);
+    if (path == NULL) {
+        perror("Erreur d'allocation de mémoire\n");
+        exit(1);
+    }
+    char phase_string[4];
+    snprintf(phase_string, sizeof(phase_string), "_%02d", phase);
+
+    strcpy(path, "results/");
+    strcat(path, file_name);
+    strcat(path, phase_string);
+    strcat(path, ".txt");
+    return path;
+}
+
 char** read_filenames(size_t* count) {
   DIR *dir = opendir("./results");
   if (dir == NULL) {
@@ -63,16 +81,36 @@ int read_highest_phase(char* gp) {
   return highest_phase;
 }
 
-void fetch_contestants(char* gp, int phase, int* car_count, int* car_nums) {
-  // TODO : récupérer les participants et les stocker dans les variables passées en paramètre
-  *car_count = INITIAL_CAR_COUNT;
-  for (size_t i = 0; i < INITIAL_CAR_COUNT; i++) {
-    car_nums[i] = INITIAL_CAR_NUMS[i];
+void read_contestants(char* path, int* car_nums, int count) {
+  FILE *file = fopen(path, "r");
+  if (file == NULL) {
+    perror("Erreur d'ouverture du fichier");
+    exit(1);
   }
+  char line[64];
+  if (fgets(line, sizeof(line), file) == NULL) {
+    perror("Erreur de lecture du fichier");
+    fclose(file);
+    exit(1);
+  }
+  char* token = strtok(line, ",");
+  int i = 0;
+  // Tant qu'on trouve des virgules
+  while (token != NULL && i < count) {
+    car_nums[i] = atoi(token); // On insère le nombre parsé dans CAR_NUMS
+    i++;
+    token = strtok(NULL, ",");
+  }
+  fclose(file);
 }
 
-void write_results(char* gp, int phase, globalmemory* shm_copy) {
+void write_results(char* gp, int phase, globalmemory* shm_copy, int car_count) {
   // TODO : écrire les résultats dans le fichier (ex: gp=Dubai phase=4 -> Dubai_4.txt ou csv ou peu importe)
+  // On écrit seulement le nombre de voitures ayant participé même si la shm a 20 places allouées
   printf("Résultats écrits dans le fichier avec succès\n");
+}
+
+void delete_results(char* gp) {
+  return;
 }
 
