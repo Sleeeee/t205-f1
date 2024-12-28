@@ -74,14 +74,14 @@ char* input_name(char* action) {
 
   if (!strcmp(action, "start")) {
     // Créée un nouveau nom et vérifie qu'il n'existe pas
-    validate_not_exists("Veuillez entrer le nom du Grand Prix (30 caractères maximum) : ", gp, gps, gps_count);
+    validate_not_exists("Veuillez entrer le nom du Grand Prix (30 caractères maximum) :", gp, gps, gps_count);
   } else {
     // Propose les noms de Grand Prix en cours et récupère le nom correspondant à l'index entré
     printf("Voici vos options :\n");
     for (size_t i = 0; i < gps_count; i++) {
       printf("  [%d] %s\n", i, gps[i]);
     }
-    int gp_index = validate_in_range("Veuillez sélectionner un grand prix : ", gps_count);
+    int gp_index = validate_in_range("Veuillez sélectionner un grand prix :", gps_count);
     strcpy(gp, gps[gp_index]); // Place le nom du grand prix sélectionné dans la variable gp
     
     // Libération de la mémoire allouée pour les noms de Grand Prix une fois que la chaine de caractère est récupérée
@@ -91,6 +91,10 @@ char* input_name(char* action) {
     free(gps);
   }
   return gp;
+}
+
+int input_length() {
+  return validate_in_range("Veuillez entrer la longueur du circuit en km (1-10) :", 10);
 }
 
 int start(char* gp, int* car_count, int* car_nums) {

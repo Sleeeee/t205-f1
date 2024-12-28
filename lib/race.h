@@ -46,15 +46,15 @@ int run_lap(int car_id, int car_num, globalmemory* global_shm, int sem_id) {
   return total;
 }
 
-void start_practice(int car_id, int car_num, globalmemory* global_shm, int sem_id) {
+void start_practice_qualif(int time_sec, int car_id, int car_num, globalmemory* global_shm, int sem_id) {
   int wants_to_run;
   while (global_shm->time_left > 0) {
-    wants_to_run = random_int(0, 1);
+    wants_to_run = rand() % 2; // 50%
     if (wants_to_run) {
-      // Court entre 5 et 10 tours
-      int laps_to_run = random_int(5, 10);
+      // Court un nombre de tours proportionnel au temps de la phase
+      int laps_to_run = random_int(max(1, time_sec/720), max(2, time_sec/360));
       for (int i = 0; i < laps_to_run; i++) {
-        if (global_shm->time_left > 45000) {
+        if (global_shm->time_left > 65000) {
           // S'il reste au moins 45 secondes, la voiture peut démarrer
           int lap_time = run_lap(car_id, car_num, global_shm, sem_id);
           if (lap_time < global_shm->cars[car_id].time_best) {
@@ -62,31 +62,49 @@ void start_practice(int car_id, int car_num, globalmemory* global_shm, int sem_i
           }
           global_shm->cars[car_id].laps_count++;
         } else {
-          // S'il ne reste plus assez de temps pour courir le prochain tour, retour au stands
-          wait_stands(global_shm->cars[car_id].time_total, car_id, global_shm);
+          // S'il ne reste plus assez de temps pour courir le prochain tour, sortie de piste
+          break;
         }
       }
     } else {
-      // Attend pendant 5 à 10 minutes
-      int time_to_wait = random_int(300000, 600000);
+      // Attend pendant un temps proportionnel au temps de la phase
+      int time_to_wait = random_int(time_sec*250/3, time_sec*500/3);
       if (global_shm->time_left > time_to_wait) {
         // Si l'horloge permet d'attendre aussi longtemps
         wait_stands(time_to_wait, car_id, global_shm);
       } else {
-        wait_stands(global_shm->cars[car_id].time_total, car_id, global_shm);
+        break;
       }
     }
   }
-}
-
-void start_qualif(int time_min, int car_num, int car_id, globalmemory* global_shm, int sem_id) {
-  printf("qualifying\n");
+  global_shm->cars[car_id].status = 0;
 }
 
 void start_race(int num_laps, int car_id, int car_num, globalmemory* global_shm, int sem_id) {
-  // TODO : définir un ou plusieurs passage(s) aux stands
   int t;
+  int* stand_laps = NULL; // Alloue initialement un entier
+  int stand_count = 0;
+  
+  // Génération des tours auxquels le pilote se rend aux stands (max 3)
+  do {
+    int lap = random_int(1, num_laps);
+    stand_laps = realloc(stand_laps, (stand_count+1) * sizeof(int));
+    if (stand_laps == NULL) {
+      perror("Échec d'allocation de mémoire");
+      exit(1);
+    }
+    stand_laps[stand_count] = lap;
+  } while ((rand() % 2) && ++stand_count < 3);
+
   for (int i = 0; i < num_laps; i++) {
+    // Analyse s'il doit aller auxs stands
+    for (int j = 0; j < stand_count; j++) {
+      if (i == stand_laps[j]) {
+        wait_stands(random_int(20000, 30000), car_id, global_shm); // Le temps est énorme comparé à un vrai pit stop mais sinon on ne le remarque pas dans l'affichage
+        break;
+      }
+    }
+    // Lancement d'un tour
     if ((t = run_lap(car_id , car_num, global_shm, sem_id)) < global_shm->cars[car_id].time_best) {
       global_shm->cars[car_id].time_best = t;
     }
@@ -94,6 +112,7 @@ void start_race(int num_laps, int car_id, int car_num, globalmemory* global_shm,
     global_shm->cars[car_id].laps_count++;
   }
   global_shm->cars[car_id].status = 0; // Course terminée
+  free(stand_laps);
 }
 
 void start_phase(int car_id, int car_num, globalmemory* global_shm, int sem_id, int phase) {
@@ -103,34 +122,34 @@ void start_phase(int car_id, int car_num, globalmemory* global_shm, int sem_id, 
     case 2:
     case 3:
     case 11:
-      start_practice(car_id, car_num, global_shm, sem_id);
+      start_practice_qualif(3600, car_id, car_num, global_shm, sem_id);
       break;
     // Qualifications
     case 4:
     case 16:
-      start_qualif(18, car_id, car_num, global_shm, sem_id);
+      start_practice_qualif(1080, car_id, car_num, global_shm, sem_id);
       break;
     case 5:
     case 17:
-      start_qualif(15, car_id, car_num, global_shm, sem_id);
+      start_practice_qualif(900, car_id, car_num, global_shm, sem_id);
       break;
     case 6:
     case 12:
     case 18:
-      start_qualif(12, car_id, car_num, global_shm, sem_id);
+      start_practice_qualif(720, car_id, car_num, global_shm, sem_id);
       break;
     case 13:
-      start_qualif(10, car_id, car_num, global_shm, sem_id);
+      start_practice_qualif(600, car_id, car_num, global_shm, sem_id);
     case 14:
-      start_qualif(8, car_id, car_num, global_shm, sem_id);
+      start_practice_qualif(480, car_id, car_num, global_shm, sem_id);
     // Course classique
     case 7:
     case 19:
-      start_race(60, car_id, car_num, global_shm, sem_id); // TODO : compter le nombre de tours selon la longueur du circuit
+      start_race(300/circuit_length, car_id, car_num, global_shm, sem_id); // TODO : compter le nombre de tours selon la longueur du circuit
       break;
     // Course sprint
     case 15:
-      start_race(20, car_id, car_num, global_shm, sem_id);
+      start_race(100/circuit_length, car_id, car_num, global_shm, sem_id);
       break;
   }
 }

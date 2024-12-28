@@ -46,7 +46,6 @@ void display_practice_qualif(int phase, int i, car* cars) {
 }
 
 void display_race(int phase, int i, car* cars) {
-  // TODO : fix les différences négatives
   int diff = get_time_diff(i, cars[i].time_total, cars[i-1].time_total); // La différence se calcule sur le temps total
   char* status = get_status(cars[i].status);
   printf("%-9d %-7d %-7.3f %-9.3f %-8s\n", cars[i].id, cars[i].laps_count, (float) cars[i].time_total/1000, (float) diff/1000, status);
@@ -79,13 +78,16 @@ void display_car(int phase, int i, car* cars) {
 
 void display_sectors(sectorbest* sector_best) {
   for (int i = 0; i < 3; i++) {
-    printf("secteur %d, car %d, time %.3f / ", i+1, sector_best[i].car_id, (float) sector_best[i].time/1000);
+    printf("Secteur %d : %.3f par voiture %d\n", i+1, (float) sector_best[i].time/1000, sector_best[i].car_id);
   }
-  printf("\n");
 }
 
-void display_timer(int time) {
-  printf("time left %d minutes %d seconds\n", time/60000, (time/1000)%60);
+void display_timer(int time_ms) {
+  if (time_ms > 0) {
+    printf("Temps restant : %d minutes %d seconds\n", time_ms/60000, (time_ms/1000)%60);
+  } else {
+    printf("Course terminée\n");
+  }
 }
 
 void sort_fastest_lap(car* cars, int count) {

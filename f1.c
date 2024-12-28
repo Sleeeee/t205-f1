@@ -43,6 +43,10 @@ int main(int argc, char *argv[]){
     printf("Ce Grand Prix est terminé, veuillez relocaliser les fichiers ou ignorer cette option\n");
     exit(0);
   }
+  int circuit_length = -1;
+  if ((phase == 7) || (phase == 15) || (phase == 19)) {
+    circuit_length = input_length();
+  }
   printf("Initialisation de la phase %d du Grand Prix de %s\n", phase, gp);
 
   // Définition d'une shared memory pouvant contenir la structure globalmemory
@@ -58,8 +62,7 @@ int main(int argc, char *argv[]){
     exit(1);
   }
   init_globalmemory(global_shm);
-  // Initialisation d'un timer si nécessaire (-1000 si non applicable)
-  init_timer(phase, global_shm);
+  init_timer(phase, global_shm); // Initialisation d'un timer si nécessaire (-1000 si non applicable)
 
   // Initialisation d'un sémaphore pour la synchronisation des processus
   int sem_id = semget(IPC_PRIVATE, 1, IPC_CREAT | 0666);
@@ -78,7 +81,7 @@ int main(int argc, char *argv[]){
       exit(1);
     } else if (pid == 0) {
       // Le processus fils initialise la voiture en lui donnant un numéro de voiture, l'identifiant du sémaphore et le pointeur vers la shm
-      init_car(i, CAR_NUMS[i], sem_id, global_shm, phase);
+      init_car(i, CAR_NUMS[i], sem_id, global_shm, phase, circuit_length);
       shmdt(global_shm); // Détachement de la shm du processus fils
       exit(0);
     }
@@ -116,7 +119,7 @@ int main(int argc, char *argv[]){
 
   // Enregistrement des résultats
   printf("Enregistrement des résultats\n");
-  write_results(gp, phase, shm_copy);
+  write_results(gp, phase, shm_copy, CAR_COUNT);
 
   // Le processus père attend la terminaison des processus fils
   for (int i = 0; i < CAR_COUNT; i++) {
