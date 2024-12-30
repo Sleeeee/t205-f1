@@ -181,15 +181,37 @@ int find_phase(char* action, char* gp, int* car_count, int* car_nums) {
 
 void results_season() {
   int points[INITIAL_CAR_COUNT];
+  int cars[INITIAL_CAR_COUNT];
   for (int i = 0; i < INITIAL_CAR_COUNT; i++) {
     points[i] = 0;
+    cars[i] = INITIAL_CAR_NUMS[i];
   }
   read_results_season(points);
+
+  // Tri des résultats par points décroissants
+  for (int i = 0; i < INITIAL_CAR_COUNT - 1; i++) {
+    for (int j = i + 1; j < INITIAL_CAR_COUNT; j++) {
+      if (points[i] < points[j]) {
+        // Échange des points
+        int temp_points = points[i];
+        points[i] = points[j];
+        points[j] = temp_points;
+
+        // Échange des numéros de voiture
+        int temp_car = cars[i];
+        cars[i] = cars[j];
+        cars[j] = temp_car;
+      }
+    }
+  }
+
+  // Affichage des résultats triés
   printf("Résultats de la saison\n");
   for (int i = 0; i < INITIAL_CAR_COUNT; i++) {
-    printf("Voiture %d : %d points\n", INITIAL_CAR_NUMS[i], points[i]);
+    printf("Voiture %d : %d points\n", cars[i], points[i]);
   }
 }
+
 
 void results_gp(char* gp) {
   printf("Résultats pour %s\n", gp);
