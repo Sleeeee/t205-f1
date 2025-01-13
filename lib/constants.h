@@ -1,5 +1,6 @@
 #define INITIAL_CAR_COUNT 20
 static const int INITIAL_CAR_NUMS[] = {1, 11, 44, 63, 16, 55, 4, 81, 14, 18, 10, 31, 23, 2, 22, 3, 77, 24, 20, 27};
+static char* CAR_NAMES[] = {"Max Verstappen", "Sergio Perez", "Lewis Hamilton", "George Russell", "Charles Leclerc", "Carlos Sainz Jr", "Lando Norris", "Oscar Piastri", "Fernando Alonso", "Lance Stroll", "Pierre Gasly", "Esteban Ocon", "Alexander Albon", "Logan Sargeant", "Yuki Tsunoda", "Daniel Ricciardo", "Valtteri Bottas", "Zhou Guanyu", "Kevin Magnussen", "Nico Hulkenberg"};
 #define TIME_DIV 20000
 #define max(a, b) ((a) > (b) ? (a) : (b))
 

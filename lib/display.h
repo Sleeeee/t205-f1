@@ -3,42 +3,17 @@ void display_refresh() {
 }
 
 void display_header(char* gp, int phase) {
-  char phase_name[7];
-  switch (phase) {
-    case 1:
-    case 11:
-      strcpy(phase_name, "P1");
-      break;
-    case 2:
-      strcpy(phase_name, "P2");
-      break;
-    case 3:
-      strcpy(phase_name, "P3");
-      break;
-    case 4:
-    case 12:
-    case 16:
-      strcpy(phase_name, "Q1");
-      break;
-    case 5:
-    case 13:
-    case 17:
-      strcpy(phase_name, "Q2");
-      break;
-    case 6:
-    case 14:
-    case 18:
-      strcpy(phase_name, "Q3");
-      break;
-    case 7:
-    case 19:
-      strcpy(phase_name, "Course");
-      break;
-    case 15:
-      strcpy(phase_name, "Sprint");
-  }
+  char* phase_name = get_phase_name(phase);
   printf("Grand Prix de %s - Phase %s (%d)\n", gp, phase_name, phase);
-  printf("%-9s %-7s %-7s %-9s %-8s\n", "Voiture", "Tours", "Temps", "Diff", "Statut");
+  printf("%-9s %-17s %-7s %-7s %-9s %-8s\n", "Voiture", "Pilote", "Tours", "Temps", "Diff", "Statut");
+}
+
+char* get_pilot_name(int id) {
+  for (int i = 0; i < INITIAL_CAR_COUNT; i++) {
+    if (INITIAL_CAR_NUMS[i] == id) {
+      return CAR_NAMES[i];
+    }
+  }
 }
 
 int get_time_diff(int i, int car_time, int previous_time) {
@@ -71,15 +46,17 @@ char* get_status(int status) {
 }
 
 void display_practice_qualif(int phase, int i, car* cars) {
+  char* name = get_pilot_name(cars[i].id);
   int diff = get_time_diff(i, cars[i].time_best, cars[i-1].time_best); // La différence se calcule sur le temps du meilleur tour
   char* status = get_status(cars[i].status);
-  printf("%-9d %-7d %-7.3f %-9.3f %-8s\n", cars[i].id, cars[i].laps_count, (float) cars[i].time_best/1000, (float) diff/1000, status);
+  printf("%-9d %-17s %-7d %-7.3f %-9.3f %-8s\n", cars[i].id, name, cars[i].laps_count, (float) cars[i].time_best/1000, (float) diff/1000, status);
 }
 
 void display_race(int phase, int i, car* cars) {
+  char* name = get_pilot_name(cars[i].id);
   int diff = get_time_diff(i, cars[i].time_total, cars[i-1].time_total); // La différence se calcule sur le temps total
   char* status = get_status(cars[i].status);
-  printf("%-9d %-7d %-7.3f %-9.3f %-8s\n", cars[i].id, cars[i].laps_count, (float) cars[i].time_total/1000, (float) diff/1000, status);
+  printf("%-9d %-17s %-7d %-7.3f %-9.3f %-8s\n", cars[i].id, name, cars[i].laps_count, (float) cars[i].time_total/1000, (float) diff/1000, status);
 }
 
 void display_car(int phase, int i, car* cars) {
