@@ -5,7 +5,7 @@ void display_refresh() {
 void display_header(char* gp, int phase) {
   char* phase_name = get_phase_name(phase);
   printf("Grand Prix de %s - Phase %s (%d)\n", gp, phase_name, phase);
-  printf("%-9s %-17s %-7s %-7s %-9s %-8s\n", "Voiture", "Pilote", "Tours", "Temps", "Diff", "Statut");
+  printf("%-9s %-17s %-7s %-10s %-7s %-8s\n", "Voiture", "Pilote", "Tours", "Temps", "Diff", "Statut");
 }
 
 char* get_pilot_name(int id) {
@@ -49,14 +49,14 @@ void display_practice_qualif(int phase, int i, car* cars) {
   char* name = get_pilot_name(cars[i].id);
   int diff = get_time_diff(i, cars[i].time_best, cars[i-1].time_best); // La différence se calcule sur le temps du meilleur tour
   char* status = get_status(cars[i].status);
-  printf("%-9d %-17s %-7d %-7.3f %-9.3f %-8s\n", cars[i].id, name, cars[i].laps_count, (float) cars[i].time_best/1000, (float) diff/1000, status);
+  printf("%-9d %-17s %-7d %-10.3f %-7.3f %-8s\n", cars[i].id, name, cars[i].laps_count, (float) cars[i].time_best/1000, (float) diff/1000, status);
 }
 
 void display_race(int phase, int i, car* cars) {
   char* name = get_pilot_name(cars[i].id);
   int diff = get_time_diff(i, cars[i].time_total, cars[i-1].time_total); // La différence se calcule sur le temps total
   char* status = get_status(cars[i].status);
-  printf("%-9d %-17s %-7d %-7.3f %-9.3f %-8s\n", cars[i].id, name, cars[i].laps_count, (float) cars[i].time_total/1000, (float) diff/1000, status);
+  printf("%-9d %-17s %-7d %-10.3f %-7.3f %-8s\n", cars[i].id, name, cars[i].laps_count, (float) cars[i].time_total/1000, (float) diff/1000, status);
 }
 
 void display_car(int phase, int i, car* cars) {
