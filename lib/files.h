@@ -1,5 +1,5 @@
 char * get_phase_name(int phase) {
-  char phase_name[7];
+  char* phase_name = (char*) malloc(7 * sizeof(char));
   switch (phase) {
     case 1:
     case 11:
